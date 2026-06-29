@@ -3,9 +3,14 @@ const request = require('supertest');
 const app = require('./app');
 
 var eventId; // Variable globale pour stocker l'ID de l'événement créé
-
+// test ok haha
 describe('API Events', () => {
-     it("should create an event with all valid fields", async () => {
+    it('should validate API password from secret', () => {
+        expect(process.env.API_PASSWORD).toBeDefined();
+        expect(process.env.API_PASSWORD).toBe('JeSuisUnMotDePasse');
+    });
+    // Tests pour POST /events
+    it("should create an event with all valid fields", async () => {
         var today = new Date();
         const response = await request(app).post('/events')
             .send({ title: 'Complete Event', date: today.toISOString().split('T')[0], participants: 10, categorie: 'Music', lieu: 'Paris' });
@@ -106,7 +111,7 @@ describe('API Events', () => {
         expect(response.body).toHaveProperty('error');
     });
 
-   
+
     it("should delete an existing event", async () => {
         const deleteResponse = await request(app).delete("/events/" + eventId);
         expect(deleteResponse.statusCode).toBe(204);
@@ -116,4 +121,20 @@ describe('API Events', () => {
         expect(deleteResponse.statusCode).toBe(404);
     });
 
+});
+describe('Health Check', () => {
+  it('GET /health devrait retourner 200 avec status ok', async () => {
+    const response = await request(app).get('/health');
+    expect(response.statusCode).toBe(200);
+    expect(response.body.status).toBe('ok');
+    expect(response.body.timestamp).toBeDefined();
+    expect(typeof response.body.timestamp).toBe('string');
+  });
+
+  it('GET /health devrait contenir env et version', async () => {
+    const response = await request(app).get('/health');
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toHaveProperty('env');
+    expect(response.body).toHaveProperty('version');
+  });
 });

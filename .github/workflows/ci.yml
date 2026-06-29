@@ -2,14 +2,35 @@ name: Pipeline CI (Lint, Build & Test)
 
 on:
   pull_request:
-    branches:
-       [ main ]
+    branches: [main]
+  push:
+    branches: [NathanR]
   workflow_dispatch:
 
 jobs:
   lint-and-test:
     name: Lint & Test
     runs-on: ubuntu-latest
+
+    env:
+      API_PASSWORD: ${{ secrets.API_PASSWORD }}
+      DATABASE_URL: postgresql://test:test@localhost:5432/test
+      NODE_ENV: test
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: test
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - name: Checkout du code
@@ -19,6 +40,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
 
       - name: Installer les dépendances
         run: npm ci
@@ -26,5 +48,18 @@ jobs:
       - name: Linter (ESLint)
         run: npm run lint
 
-      - name: Tests (Jest)
-        run: npm test
+      - name: Vérifier les variables d'environnement requises
+        run: |
+          chmod +x scripts/check-env.sh
+          ./scripts/check-env.sh
+
+      - name: Tests (Jest) avec couverture
+        run: npm test -- --coverage
+
+      - name: Upload rapport de tests
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: coverage/
+          retention-days: 7
