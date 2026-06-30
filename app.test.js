@@ -123,18 +123,18 @@ describe('API Events', () => {
 
 });
 describe('Health Check', () => {
-  it('GET /health devrait retourner 200 avec status ok', async () => {
-    const response = await request(app).get('/health');
-    expect(response.statusCode).toBe(200);
-    expect(response.body.status).toBe('ok');
-    expect(response.body.timestamp).toBeDefined();
-    expect(typeof response.body.timestamp).toBe('string');
-  });
+    it('GET /health devrait retourner 200 avec status ok', async () => {
+        const response = await request(app).get('/health');
+        expect(response.statusCode).toBe(200);
+        expect(response.body.status).toBe('ok');
+        expect(response.body.timestamp).toBeDefined();
+        expect(typeof response.body.timestamp).toBe('string');
+    });
 
-  it('GET /health devrait contenir env et version', async () => {
-    const response = await request(app).get('/health');
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toHaveProperty('env');
-    expect(response.body).toHaveProperty('version');
-  });
+    it('GET /health devrait contenir env et version', async () => {
+        const response = await request(app).get('/health');
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty('env');
+        expect(response.body).toHaveProperty('version');
+    });
 });
