@@ -10,7 +10,7 @@ describe('API Events', () => {
         expect(process.env.API_PASSWORD).toBe('JeSuisUnMotDePasse');
     });
     // Tests pour POST /events
-    it("should create an event with all valid field", async () => {
+    it("should create an event with all valid fields", async () => {
         var today = new Date();
         const response = await request(app).post('/events')
             .send({ title: 'Complete Event', date: today.toISOString().split('T')[0], participants: 10, categorie: 'Music', lieu: 'Paris' });
